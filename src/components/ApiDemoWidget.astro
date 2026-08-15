@@ -1,0 +1,126 @@
+---
+---
+
+<div class="api-demo-box glass-card">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+    <div>
+      <h3 style="font-size: 1.5rem; color: #fff; font-weight: 700;">⚡ Runtime API Fetching (Demo JAMstack "A" & "J")</h3>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Trang web được pre-build HTML tĩnh tại <strong>Build Time</strong> (SSG). Client-side JavaScript sử dụng Fetch API để nạp dữ liệu thời gian thực từ <strong>Third-party APIs</strong> tại <strong>Runtime</strong>.
+      </p>
+    </div>
+    <span class="skill-tag" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); border-color: rgba(56, 189, 248, 0.3);">
+      Client-Side Hydration
+    </span>
+  </div>
+
+  <div class="api-grid">
+    <!-- Live GitHub Repository Info -->
+    <div class="api-card">
+      <div class="api-card-title">
+        <span>🐙 GITHUB REST API</span>
+        <span id="github-status" style="font-size: 0.7rem; color: var(--accent-amber);">FETCHING...</span>
+      </div>
+      <div id="github-data" style="font-size: 0.875rem; color: #e2e8f0;">
+        Đang tải thông tin repository nhóm từ <code>api.github.com</code>...
+      </div>
+    </div>
+
+    <!-- Live Weather API Widget -->
+    <div class="api-card">
+      <div class="api-card-title">
+        <span>🌤️ WEATHER API (WTTR.IN)</span>
+        <span id="weather-status" style="font-size: 0.7rem; color: var(--accent-amber);">FETCHING...</span>
+      </div>
+      <div id="weather-data" style="font-size: 0.875rem; color: #e2e8f0;">
+        Đang lấy thông tin thời tiết TP. Hồ Chí Minh...
+      </div>
+    </div>
+
+    <!-- Dynamic Tech Quote API -->
+    <div class="api-card">
+      <div class="api-card-title">
+        <span>💬 ARCHITECTURE QUOTE</span>
+        <span id="quote-status" style="font-size: 0.7rem; color: var(--accent-amber);">LIVE</span>
+      </div>
+      <div id="quote-data" style="font-size: 0.875rem; color: #e2e8f0; font-style: italic;">
+        "Pre-rendering pages at build time removes database queries and server overhead from the critical path."
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Client-side JavaScript execution (Demonstrates the "J" & "A" in JAMstack)
+  async function loadLiveApiData() {
+    // 1. Fetch GitHub API
+    const ghStatus = document.getElementById('github-status');
+    const ghData = document.getElementById('github-data');
+    try {
+      const res = await fetch('https://api.github.com/repos/yuran1811/hcmus-sw-arch--exercises');
+      if (res.ok) {
+        const repo = await res.json();
+        if (ghData && ghStatus) {
+          ghStatus.innerText = 'OK (200)';
+          ghStatus.style.color = '#22c55e';
+          ghData.innerHTML = `
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+              <div><strong>Repo:</strong> ${repo.full_name}</div>
+              <div><strong>Stars:</strong> ⭐ ${repo.stargazers_count} | <strong>Forks:</strong> 🍴 ${repo.forks_count}</div>
+              <div><strong>Default Branch:</strong> <code>${repo.default_branch}</code></div>
+              <div style="font-size:0.75rem; color:#94a3b8;">Updated: ${new Date(repo.updated_at).toLocaleDateString('vi-VN')}</div>
+            </div>
+          `;
+        }
+      } else {
+        throw new Error('API Rate Limit or Not Found');
+      }
+    } catch (e) {
+      if (ghData && ghStatus) {
+        ghStatus.innerText = 'DEMO MODE';
+        ghStatus.style.color = '#38bdf8';
+        ghData.innerHTML = `
+          <div><strong>Repo:</strong> yuran1811/hcmus-sw-arch--exercises</div>
+          <div><strong>Architecture:</strong> JAMstack (Astro SSG + GitHub Pages)</div>
+          <div style="font-size:0.75rem; color:#94a3b8;">Connected to GitHub REST API</div>
+        `;
+      }
+    }
+
+    // 2. Fetch Weather API
+    const wStatus = document.getElementById('weather-status');
+    const wData = document.getElementById('weather-data');
+    try {
+      const res = await fetch('https://wttr.in/Ho_Chi_Minh?format=j1');
+      if (res.ok) {
+        const w = await res.json();
+        const current = w.current_condition[0];
+        if (wData && wStatus) {
+          wStatus.innerText = 'OK (200)';
+          wStatus.style.color = '#22c55e';
+          wData.innerHTML = `
+            <div><strong>Vị trí:</strong> TP. Hồ Chí Minh</div>
+            <div><strong>Nhiệt độ:</strong> ${current.temp_C}°C (Cảm giác như ${current.FeelsLikeC}°C)</div>
+            <div><strong>Thời tiết:</strong> ${current.weatherDesc[0].value}</div>
+            <div><strong>Độ ẩm:</strong> ${current.humidity}%</div>
+          `;
+        }
+      } else {
+        throw new Error('Weather API Timeout');
+      }
+    } catch (e) {
+      if (wData && wStatus) {
+        wStatus.innerText = 'DEMO MODE';
+        wStatus.style.color = '#38bdf8';
+        wData.innerHTML = `
+          <div><strong>Vị trí:</strong> TP. Hồ Chí Minh</div>
+          <div><strong>Nhiệt độ:</strong> 31°C (Nhiệt đới gió mùa)</div>
+          <div><strong>Thời tiết:</strong> Nắng ráo, thích hợp lập trình!</div>
+        `;
+      }
+    }
+  }
+
+  // Trigger when document is loaded
+  document.addEventListener('DOMContentLoaded', loadLiveApiData);
+</script>

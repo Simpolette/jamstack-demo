@@ -1,0 +1,70 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TeamMemberCard from '../components/TeamMemberCard.astro';
+import CountdownWidget from '../components/CountdownWidget.astro';
+import WeatherWidget from '../components/WeatherWidget.astro';
+import JamstackExplainer from '../components/JamstackExplainer.astro';
+import { teamMembers } from '../data/team';
+---
+
+<Layout title="Demo thực hành - kiến trúc jamstack">
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-tag">
+        <span>🚀 SOFTWARE ARCHITECTURE EXERCISES</span>
+      </div>
+      <h1 class="hero-title">
+        Demo Thực Hành <br />
+        <span>Kiến Trúc JAMstack</span>
+      </h1>
+      <p class="hero-desc">
+        Website giới thiệu thông tin nhóm nghiên cứu Kiến trúc Phần mềm. Dự án được thiết kế và triển khai thực tế chuẩn kiến trúc <strong>JAMstack</strong> (Astro SSG + GitHub Pages + Client API Integration).
+      </p>
+
+      <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+        <a 
+          href="#team" 
+          style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, var(--accent-cyan), #0284c7); color: #000; font-weight: 700; border-radius: 0.75rem; text-decoration: none; box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);"
+        >
+          👥 Danh Sách 6 Thành Viên
+        </a>
+        <a 
+          href="#jamstack-info" 
+          style="padding: 0.75rem 1.5rem; background: rgba(255, 255, 255, 0.08); color: #fff; font-weight: 600; border-radius: 0.75rem; text-decoration: none; border: 1px solid var(--border-card);"
+        >
+          📖 Kiến Trúc JAMstack
+        </a>
+      </div>
+    </section>
+
+    <!-- Countdown Timer Section (13:30 28/08/2026) -->
+    <section id="countdown">
+      <CountdownWidget />
+    </section>
+
+    <!-- Weather Live API Widget with Refresh & Study Quote (Placed right under Countdown) -->
+    <section id="weather">
+      <WeatherWidget />
+    </section>
+
+    <!-- Team Members Grid Section -->
+    <section id="team" style="scroll-margin-top: 5rem;">
+      <div class="section-header">
+        <h2>👥 Thành Viên Trong Nhóm (6 Sinh Viên)</h2>
+        <p>Phân chia lĩnh vực chuyên môn và nghiên cứu kiến trúc hệ thống</p>
+      </div>
+
+      <div class="team-grid">
+        {teamMembers.map((member) => (
+          <TeamMemberCard member={member} />
+        ))}
+      </div>
+    </section>
+
+    <!-- JAMstack Architecture Explainer -->
+    <section id="jamstack-info">
+      <JamstackExplainer />
+    </section>
+  </div>
+</Layout>

@@ -1,0 +1,136 @@
+---
+---
+
+<div class="glass-card" style="padding: 1.5rem 2rem; margin: 2rem 0; border-color: rgba(192, 132, 252, 0.3); background: radial-gradient(circle at top left, rgba(192, 132, 252, 0.12), transparent 70%), var(--bg-card);">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+    <div>
+      <h3 style="font-size: 1.25rem; color: #fff; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+        ⏳ Đếm Ngược Thời Gian Vấn Đáp Cuối Kỳ
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+        (Đồng bộ qua <code>TimeAPI.io via CORS Proxy</code>)
+      </p>
+    </div>
+    <span class="skill-tag" id="countdown-status" style="background: rgba(192, 132, 252, 0.15); color: var(--accent-purple); border-color: rgba(192, 132, 252, 0.3);">
+      🔄 Connecting API...
+    </span>
+  </div>
+
+  <!-- Countdown Timer Display -->
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; text-align: center;">
+    <div style="background: rgba(10, 13, 20, 0.7); border: 1px solid var(--border-card); border-radius: 0.75rem; padding: 1rem 0.5rem;">
+      <div id="cd-days" style="font-size: 2.25rem; font-weight: 800; color: var(--accent-cyan); font-family: var(--font-mono); line-height: 1;">00</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-top: 0.4rem; font-weight: 600;">Ngày</div>
+    </div>
+    
+    <div style="background: rgba(10, 13, 20, 0.7); border: 1px solid var(--border-card); border-radius: 0.75rem; padding: 1rem 0.5rem;">
+      <div id="cd-hours" style="font-size: 2.25rem; font-weight: 800; color: var(--accent-purple); font-family: var(--font-mono); line-height: 1;">00</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-top: 0.4rem; font-weight: 600;">Giờ</div>
+    </div>
+
+    <div style="background: rgba(10, 13, 20, 0.7); border: 1px solid var(--border-card); border-radius: 0.75rem; padding: 1rem 0.5rem;">
+      <div id="cd-minutes" style="font-size: 2.25rem; font-weight: 800; color: var(--accent-pink); font-family: var(--font-mono); line-height: 1;">00</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-top: 0.4rem; font-weight: 600;">Phút</div>
+    </div>
+
+    <div style="background: rgba(10, 13, 20, 0.7); border: 1px solid var(--border-card); border-radius: 0.75rem; padding: 1rem 0.5rem;">
+      <div id="cd-seconds" style="font-size: 2.25rem; font-weight: 800; color: var(--accent-amber); font-family: var(--font-mono); line-height: 1;">00</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-top: 0.4rem; font-weight: 600;">Giây</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Target: 13:30 on 28/08/2026 (GMT+7 Vietnam Time)
+  const TARGET_DATE_STRING = "2026-08-28T13:30:00+07:00";
+  const targetTime = new Date(TARGET_DATE_STRING).getTime();
+
+  async function initCountdownAPI() {
+    const statusEl = document.getElementById('countdown-status');
+    const daysEl = document.getElementById('cd-days');
+    const hoursEl = document.getElementById('cd-hours');
+    const minutesEl = document.getElementById('cd-minutes');
+    const secondsEl = document.getElementById('cd-seconds');
+
+    let serverTime = Date.now();
+    let localStart = Date.now();
+    let apiSuccess = false;
+
+    // CORS Proxy URL directly as primary method
+    const timeApiTarget = 'https://timeapi.io/api/v1/time/current/zone?timeZone=Asia/Ho_Chi_Minh';
+    const primaryCorsProxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(timeApiTarget);
+
+    try {
+      // Primary call via CORS Proxy
+      const res = await fetch(primaryCorsProxyUrl);
+      console.log("CORS Proxy Response Status:", res.status);
+      
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      console.log("TimeAPI Data via CORS Proxy:", data);
+
+      // Support dateTime or date_time or constructed ISO string
+      const rawTimeString = data.dateTime || data.date_time || (data.year ? `${data.year}-${String(data.month).padStart(2,'0')}-${String(data.day).padStart(2,'0')}T${String(data.hour).padStart(2,'0')}:${String(data.minute).padStart(2,'0')}:${String(data.seconds).padStart(2,'0')}` : null);
+
+      if (rawTimeString) {
+        serverTime = new Date(rawTimeString).getTime();
+        localStart = Date.now();
+        apiSuccess = true;
+
+        if (statusEl) {
+          statusEl.innerText = "🟢 Sync: TimeAPI.io (200 OK)";
+          statusEl.style.color = "#22c55e";
+          statusEl.style.backgroundColor = "rgba(34, 197, 94, 0.15)";
+          statusEl.style.borderColor = "rgba(34, 197, 94, 0.3)";
+        }
+      } else {
+        throw new Error("Không thể parse trường ngày tháng trong JSON trả về");
+      }
+    } catch (err: any) {
+      console.error("CORS Proxy Main Fetch Error:", err);
+      if (statusEl) {
+        statusEl.innerText = `❌ Lỗi TimeAPI CORS Proxy (${err?.message || 'Failed'})`;
+        statusEl.style.color = "#f43f5e";
+        statusEl.style.backgroundColor = "rgba(244, 63, 94, 0.15)";
+        statusEl.style.borderColor = "rgba(244, 63, 94, 0.3)";
+      }
+    }
+
+    // Update countdown timer every second
+    function updateTimer() {
+      const elapsed = Date.now() - localStart;
+      const currentNow = serverTime + elapsed;
+      const diff = targetTime - currentNow;
+
+      if (diff <= 0) {
+        if (daysEl) daysEl.innerText = "00";
+        if (hoursEl) hoursEl.innerText = "00";
+        if (minutesEl) minutesEl.innerText = "00";
+        if (secondsEl) secondsEl.innerText = "00";
+        if (statusEl) {
+          statusEl.innerText = "🎉 ĐÃ ĐẾN GIỜ VẤN ĐÁP!";
+          statusEl.style.color = "#f43f5e";
+        }
+        return;
+      }
+
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+      if (daysEl) daysEl.innerText = String(d).padStart(2, '0');
+      if (hoursEl) hoursEl.innerText = String(h).padStart(2, '0');
+      if (minutesEl) minutesEl.innerText = String(m).padStart(2, '0');
+      if (secondsEl) secondsEl.innerText = String(s).padStart(2, '0');
+    }
+
+    updateTimer();
+    setInterval(updateTimer, 1000);
+  }
+
+  document.addEventListener('DOMContentLoaded', initCountdownAPI);
+</script>

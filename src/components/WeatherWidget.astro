@@ -1,0 +1,167 @@
+---
+---
+
+<div class="glass-card" style="padding: 1.5rem 2rem; margin: 1.5rem 0 3rem; border-color: rgba(56, 189, 248, 0.3); background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 70%), var(--bg-card);">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+    <div>
+      <h3 style="font-size: 1.25rem; color: #fff; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+        🌤️ Thời Tiết Thời Gian Thực & Lời Khuyên Ôn Tập
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+        Dữ liệu live từ <code>wttr.in API</code> (TP. Hồ Chí Minh)
+      </p>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <span class="skill-tag" id="weather-api-status" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); border-color: rgba(56, 189, 248, 0.3);">
+        🔄 Đang kết nối API...
+      </span>
+      <button 
+        id="btn-refresh-weather"
+        type="button"
+        style="padding: 0.4rem 0.8rem; font-size: 0.85rem; font-weight: 600; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-card); color: #fff; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s;"
+        title="Bấm để tải lại dữ liệu mới nhất từ API"
+      >
+        🔄 Làm mới API
+      </button>
+    </div>
+  </div>
+
+  <!-- Weather Display Grid -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+    <div style="background: rgba(10, 13, 20, 0.6); border: 1px solid var(--border-card); border-radius: 0.75rem; padding: 1.25rem;">
+      <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-family: var(--font-mono);">Nhiệt độ hiện tại</div>
+      <div id="w-temp" style="font-size: 2rem; font-weight: 800; color: var(--accent-amber); font-family: var(--font-mono); margin-top: 0.3rem;">--°C</div>
+      <div id="w-feelslike" style="font-size: 0.8rem; color: #cbd5e1; margin-top: 0.2rem;">Cảm giác như: --°C</div>
+    </div>
+
+    <div style="background: rgba(10, 13, 20, 0.6); border: 1px solid var(--border-card); border-radius: 0.75rem; padding: 1.25rem;">
+      <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-family: var(--font-mono);">Trạng thái thời tiết</div>
+      <div id="w-condition" style="font-size: 1.25rem; font-weight: 700; color: var(--accent-cyan); margin-top: 0.4rem;">Đang nạp...</div>
+      <div id="w-humidity" style="font-size: 0.8rem; color: #cbd5e1; margin-top: 0.2rem;">Độ ẩm: --%</div>
+    </div>
+
+    <div style="background: rgba(10, 13, 20, 0.6); border: 1px solid var(--border-card); border-radius: 0.75rem; padding: 1.25rem;">
+      <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-family: var(--font-mono);">Cập nhật gần nhất</div>
+      <div id="w-updatetime" style="font-size: 1.1rem; font-weight: 600; color: var(--accent-purple); margin-top: 0.4rem; font-family: var(--font-mono);">--:--:--</div>
+      <div style="font-size: 0.8rem; color: #475569; margin-top: 0.2rem;">Khu vực: TP. Hồ Chí Minh</div>
+    </div>
+  </div>
+
+  <!-- Dynamic Study Quote / Recommendation Box -->
+  <div style="padding: 1rem 1.25rem; background: rgba(0, 0, 0, 0.3); border-radius: 0.75rem; border-left: 4px solid var(--accent-cyan); display: flex; align-items: center; gap: 0.75rem;">
+    <span style="font-size: 1.5rem;">💡</span>
+    <div>
+      <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.05em;">Lời Khuyên Ôn Tập Hôm Nay</div>
+      <div id="w-study-quote" style="font-size: 0.95rem; color: #f1f5f9; margin-top: 0.2rem; font-style: italic;">
+        "Đang phân tích thời tiết để đưa ra gợi ý không gian học tập tối ưu..."
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function fetchLiveWeatherData() {
+    const statusEl = document.getElementById('weather-api-status');
+    const tempEl = document.getElementById('w-temp');
+    const feelsEl = document.getElementById('w-feelslike');
+    const condEl = document.getElementById('w-condition');
+    const humEl = document.getElementById('w-humidity');
+    const timeEl = document.getElementById('w-updatetime');
+    const quoteEl = document.getElementById('w-study-quote');
+    const refreshBtn = document.getElementById('btn-refresh-weather') as HTMLButtonElement;
+
+    if (refreshBtn) {
+      refreshBtn.disabled = true;
+      refreshBtn.innerText = "⏳ Đang tải...";
+    }
+    if (statusEl) {
+      statusEl.innerText = "🔄 Calling wttr.in API...";
+      statusEl.style.color = "#fbbf24";
+    }
+
+    try {
+      // Call Live Weather API directly (NO FALLBACK DATA)
+      const res = await fetch('https://wttr.in/Ho_Chi_Minh?format=j1');
+      if (!res.ok) {
+        throw new Error(`HTTP Error ${res.status}: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      if (!data || !data.current_condition || !data.current_condition[0]) {
+        throw new Error("Dữ liệu API trả về không đúng định dạng JSON");
+      }
+
+      const current = data.current_condition[0];
+      const tempC = current.temp_C;
+      const feelsC = current.FeelsLikeC;
+      const desc = current.weatherDesc[0].value;
+      const humidity = current.humidity;
+      const nowStr = new Date().toLocaleTimeString('vi-VN');
+
+      if (tempEl) tempEl.innerText = `${tempC}°C`;
+      if (feelsEl) feelsEl.innerText = `Cảm giác như: ${feelsC}°C`;
+      if (condEl) condEl.innerText = desc;
+      if (humEl) humEl.innerText = `Độ ẩm: ${humidity}%`;
+      if (timeEl) timeEl.innerText = nowStr;
+
+      if (statusEl) {
+        statusEl.innerText = "🟢 Live API (200 OK)";
+        statusEl.style.color = "#22c55e";
+        statusEl.style.backgroundColor = "rgba(34, 197, 94, 0.15)";
+        statusEl.style.borderColor = "rgba(34, 197, 94, 0.3)";
+      }
+
+      // Generate customized study quote based on live weather condition
+      let quote = "";
+      const tempNum = parseInt(tempC, 10);
+      const descLower = desc.toLowerCase();
+
+      if (descLower.includes('rain') || descLower.includes('drizzle') || descLower.includes('shower')) {
+        quote = "Trời đang mưa mát mẻ — Không gian lý tưởng để pha một tách cà phê ấm và tập trung ôn luyện lý thuyết Kiến trúc Phần mềm!";
+      } else if (tempNum >= 33) {
+        quote = "Thời tiết khá oi nóng — Hãy bật điều hòa ở mức vừa phải, uống đủ nước và ôn tập các phần sơ đồ góc nhìn Logic & Deployment!";
+      } else if (tempNum <= 28) {
+        quote = "Thời tiết rất mát mẻ dễ chịu — Tinh thần minh mẫn tuyệt vời để cùng nhóm làm bài thực hành và kiểm thử hệ thống!";
+      } else {
+        quote = "Thời tiết dịu nhẹ nắng đẹp — Thích hợp để ngồi ôn lại kịch bản trả lời vấn đáp!";
+      }
+
+      if (quoteEl) quoteEl.innerText = `"${quote}"`;
+
+    } catch (error: any) {
+      // EXPLICIT ERROR HANDLING - NO DUMMY FALLBACK DATA
+      const errorMsg = error?.message || "Không thể kết nối đến Weather API";
+      
+      if (statusEl) {
+        statusEl.innerText = `❌ Lỗi API (${errorMsg})`;
+        statusEl.style.color = "#f43f5e";
+        statusEl.style.backgroundColor = "rgba(244, 63, 94, 0.15)";
+        statusEl.style.borderColor = "rgba(244, 63, 94, 0.3)";
+      }
+      if (tempEl) tempEl.innerText = "ERR";
+      if (feelsEl) feelsEl.innerText = "Cảm giác như: N/A";
+      if (condEl) condEl.innerText = "❌ Lỗi kết nối API";
+      if (humEl) humEl.innerText = "Độ ẩm: N/A";
+      if (timeEl) timeEl.innerText = new Date().toLocaleTimeString('vi-VN');
+      if (quoteEl) {
+        quoteEl.innerText = `❌ Không thể lấy dữ liệu thời tiết từ API (wttr.in). Chi tiết lỗi: "${errorMsg}". Vui lòng kiểm tra kết nối mạng và bấm 'Làm mới API'.`;
+      }
+    } finally {
+      if (refreshBtn) {
+        refreshBtn.disabled = false;
+        refreshBtn.innerText = "🔄 Làm mới API";
+      }
+    }
+  }
+
+  // Setup click handler for Refresh button & initial load
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchLiveWeatherData();
+
+    const refreshBtn = document.getElementById('btn-refresh-weather');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', fetchLiveWeatherData);
+    }
+  });
+</script>

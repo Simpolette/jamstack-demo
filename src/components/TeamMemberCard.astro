@@ -1,0 +1,32 @@
+---
+import type { TeamMember } from '../data/team';
+
+interface Props {
+  member: TeamMember;
+}
+
+const { member } = Astro.props;
+---
+
+<div class="glass-card member-card" id={`member-${member.id}`}>
+  <div class="member-header">
+    <img src={member.avatar} alt={member.name} class="member-avatar" loading="lazy" />
+    <div class="member-info">
+      <h3>{member.name}</h3>
+      <div class="member-role">{member.role}</div>
+      <div class="member-topic">Chủ đề: {member.topic}</div>
+    </div>
+  </div>
+  
+  <p class="member-bio">{member.bio}</p>
+  
+  <div style="margin-bottom: 1rem; padding: 0.6rem 0.8rem; background: rgba(0, 0, 0, 0.2); border-radius: 0.5rem; border-left: 3px solid var(--accent-cyan); font-size: 0.825rem; color: #cbd5e1;">
+    <strong>Lĩnh vực chuyên sâu:</strong> {member.focusArea}
+  </div>
+
+  <div class="skills-list">
+    {member.skills.map((skill) => (
+      <span class="skill-tag">{skill}</span>
+    ))}
+  </div>
+</div>

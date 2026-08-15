@@ -1,0 +1,65 @@
+---
+---
+
+<div style="margin: 4rem 0;">
+  <div class="section-header">
+    <h2>🏛️ Tổng Quan Kiến Trúc JAMstack</h2>
+    <p>Phân tích 6 Đặc tính chất lượng (Quality Attributes) & Mô hình Kiến trúc</p>
+  </div>
+
+  <div class="arch-grid">
+    <div class="arch-card">
+      <h4>⚡ 1. Performance (Hiệu năng)</h4>
+      <p style="font-size: 0.875rem; color: var(--text-muted);">
+        <strong>WHAT:</strong> TTFB & FCP &lt;1s nhờ pre-built HTML tĩnh.<br/>
+        <strong>HOW kiểm tra:</strong> Chạy <code>npx lighthouse &lt;url&gt;</code> hoặc WebPageTest.<br/>
+        <strong>WHY:</strong> Phục vụ lượng người dùng lớn cần tốc độ cao bằng cache HTML có sẵn.
+      </p>
+    </div>
+
+    <div class="arch-card">
+      <h4>📈 2. Scalability (Mở rộng)</h4>
+      <p style="font-size: 0.875rem; color: var(--text-muted);">
+        <strong>WHAT:</strong> Mở rộng vô hạn trên CDN Edge Nodes.<br/>
+        <strong>HOW kiểm tra:</strong> Stress test bằng <code>k6 run --vus 500 load-test.js</code>.<br/>
+        <strong>WHY:</strong> Loại bỏ origin application server khỏi critical path.
+      </p>
+    </div>
+
+    <div class="arch-card">
+      <h4>🛡️ 3. Security (Bảo mật)</h4>
+      <p style="font-size: 0.875rem; color: var(--text-muted);">
+        <strong>WHAT:</strong> Giảm thiểu tối đa bề mặt tấn công (Attack Surface).<br/>
+        <strong>HOW kiểm tra:</strong> Scan lỗ hổng với OWASP ZAP & Mozilla Observatory.<br/>
+        <strong>WHY:</strong> Không có web server runtime động hay database bị lộ trực tiếp.
+      </p>
+    </div>
+
+    <div class="arch-card">
+      <h4>💎 4. Reliability (Độ tin cậy)</h4>
+      <p style="font-size: 0.875rem; color: var(--text-muted);">
+        <strong>WHAT:</strong> Uptime CDN &gt;99.99%, graceful degradation.<br/>
+        <strong>HOW kiểm tra:</strong> Giám sát UptimeRobot; ngắt backend API kiểm tra UI tĩnh.<br/>
+        <strong>WHY:</strong> Trang tĩnh vẫn hoạt động bình thường kể cả khi API down.
+      </p>
+    </div>
+
+    <div class="arch-card">
+      <h4>🔧 5. Modifiability (Dễ bảo trì)</h4>
+      <p style="font-size: 0.875rem; color: var(--text-muted);">
+        <strong>WHAT:</strong> Tách biệt Content (Markdown), Layout (Astro) & APIs.<br/>
+        <strong>HOW kiểm tra:</strong> Quy trình CI/CD Git-based (commit ➔ auto build & deploy).<br/>
+        <strong>WHY:</strong> Thay đổi nội dung không làm ảnh hưởng đến mã nguồn hệ thống.
+      </p>
+    </div>
+
+    <div class="arch-card">
+      <h4>💰 6. Cost Efficiency (Chi phí)</h4>
+      <p style="font-size: 0.875rem; color: var(--text-muted);">
+        <strong>WHAT:</strong> Chi phí hosting tĩnh tiệm cận 0đ (Free GitHub Pages).<br/>
+        <strong>HOW kiểm tra:</strong> So sánh chi phí hosting tĩnh vs VPS server 24/7.<br/>
+        <strong>WHY:</strong> Không tốn chi phí duy trì Server/Database khi ít request.
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+---
+import Header from '../components/Header.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { 
+  title = "Website Giới Thiệu Nhóm 6 Thành Viên | Ôn Tập Kiến Trúc Phần Mềm",
+  description = "Demo Kiến trúc JAMstack sử dụng Astro SSG, GitHub Pages và Third-party API integration."
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <footer>
+      <div class="container">
+        <p>© 2026 Nhóm Ôn Tập Vấn Đáp Kiến Trúc Phần Mềm (TS. Ngô Huy Biên) - HCMUS</p>
+        <p style="font-size: 0.8rem; margin-top: 0.5rem; color: #64748b;">
+          Được xây dựng theo mẫu kiến trúc <strong>JAMstack</strong> (JavaScript + APIs + Markup) với <strong>Astro SSG</strong>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
