@@ -206,10 +206,10 @@ test_endpoint "Homepage vẫn tải khi không có API " "$SITE_URL" || true
 echo ""
 echo "4.2. Kiểm tra API ngoài (Client-side runtime):"
 API_WEATHER="https://wttr.in/Ho_Chi_Minh?format=j1"
-API_TIME="https://api.open-meteo.com/v1/forecast?latitude=10.8231&longitude=106.6297&current_weather=true&timezone=Asia%2FHo_Chi_Minh"
+API_TIME="https://timeapi.io/api/v1/time/current/zone?timeZone=Asia/Ho_Chi_Minh"
 
 test_endpoint "Weather API (wttr.in)            " "$API_WEATHER" || true
-test_endpoint "Time Sync API (Open-Meteo)       " "$API_TIME" || true
+test_endpoint "Time Sync API (TimeAPI.io)       " "$API_TIME" || true
 
 echo ""
 echo "4.3. Graceful Degradation Check:"
